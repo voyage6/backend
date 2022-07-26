@@ -1,15 +1,18 @@
 package com.mini.backend.service;
 
+import com.mini.backend.domain.Post;
 import com.mini.backend.domain.Users;
-import com.mini.backend.dto.IdCheckDto;
-import com.mini.backend.dto.SignupRequestDto;
+import com.mini.backend.dto.*;
 import com.mini.backend.repository.UserRepository;
+import com.mini.backend.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -33,4 +36,19 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public UserResponseDto getUser(UserDetailsImpl userDetails) {
+        return new UserResponseDto(userDetails.getUser());
+    }
+
+    public ResponseEntity<?> updateUser(Long userId, UserUpdateRequestDto userUpdateRequestDto, UserDetailsImpl userDetails) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow( () -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+        if(!userId.equals(userDetails.getUser().getId()))
+            return new ResponseEntity<>(HttpStatus.valueOf(403));
+        else {
+            user.update(userUpdateRequestDto);
+            userRepository.save(user);
+            return new ResponseEntity<>(HttpStatus.valueOf(204));
+        }
+    }
 }

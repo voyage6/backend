@@ -12,7 +12,7 @@ public class CommentResponseDto {
     private Long userId;
     private Long postId;
     private String contents;
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     public CommentResponseDto(Comment comment) {
         this.userId = comment.getUser().getId();

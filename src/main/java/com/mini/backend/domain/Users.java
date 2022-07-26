@@ -1,5 +1,6 @@
 package com.mini.backend.domain;
 
+import com.mini.backend.dto.UserUpdateRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity //DB 테이블 역할
 
-public class Users {
+public class Users extends Timestamped{
 
     //ID : 인덱스 번호
     @GeneratedValue(strategy = GenerationType.AUTO) // 자동증가
@@ -38,4 +39,8 @@ public class Users {
         this.userName = userName;
     }
 
+    public void update(UserUpdateRequestDto userUpdateRequestDto) {
+        this.userName = userUpdateRequestDto.getUserName();
+        this.profileURL = userUpdateRequestDto.getProfileUrl();
+    }
 }

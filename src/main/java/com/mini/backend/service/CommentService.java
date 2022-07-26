@@ -9,6 +9,9 @@ import com.mini.backend.repository.PostRepository;
 import com.mini.backend.repository.UserRepository;
 import com.mini.backend.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,13 +45,12 @@ public class CommentService {
         return new CommentResponseDto(comment);
     }
 
-
-    public String deleteComment(Long commentId, UserDetailsImpl user) {
+    public ResponseEntity<?> deleteComment(Long commentId, UserDetailsImpl user) {
         if (isWriter(commentId, user)) {
             commentRepository.deleteById(commentId);
-            return "삭제완료";
+            return new ResponseEntity<>(HttpStatus.valueOf(204));
         }
-        return "댓글을 작성한 유저만 삭제할 수 있습니다.";
+        return new ResponseEntity<>(HttpStatus.valueOf(403));
     }
 
     private boolean isWriter(Long commentId, UserDetailsImpl user) {

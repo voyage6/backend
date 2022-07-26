@@ -17,8 +17,8 @@ public class PostResponseDto {
     private String category;
     private List<String> imgUrls;
 //    private List<String> imgFileNames;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String createdAt;
+    private String updatedAt;
 
     public PostResponseDto(Post post) {
         this.id = post.getId();

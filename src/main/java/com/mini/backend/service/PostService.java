@@ -66,8 +66,6 @@ public class PostService {
     public ResponseEntity<?> deletePost(Long postId, String userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow( () -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-        System.out.println(post.getUser().getUserId());
-        System.out.println(userId);
         if(!post.getUser().getUserId().equals(userId)){
             return new ResponseEntity<>(HttpStatus.valueOf(403));
         }else {

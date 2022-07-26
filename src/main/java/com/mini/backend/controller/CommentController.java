@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Controller
+@RestController
 public class CommentController {
     private final CommentService commentService;
 
@@ -34,11 +34,8 @@ public class CommentController {
     }
 
     @DeleteMapping("api/comments/{commentId}")
-    @ResponseBody
     public ResponseEntity<?> deleteComment(@AuthenticationPrincipal UserDetailsImpl user, @PathVariable Long commentId) {
-        commentService.deleteComment(commentId, user);
-        String result = commentService.deleteComment(commentId, user);
-        return new ResponseEntity<>(result, HttpStatus.valueOf(204));
+        return commentService.deleteComment(commentId, user);
     }
 
 }

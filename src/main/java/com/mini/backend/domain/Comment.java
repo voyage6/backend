@@ -12,17 +12,16 @@ import javax.persistence.*;
 @Table(name = "Comment")
 public class Comment extends Timestamped{
 
-    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
+    @Id
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "postId", nullable = false)
+    @JoinColumn(nullable = false)
     private Post post;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(nullable = false)
     private Users user;
 
     @Column(nullable = false)

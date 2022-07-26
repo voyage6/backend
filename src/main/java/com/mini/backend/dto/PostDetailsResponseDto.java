@@ -18,8 +18,8 @@ public class PostDetailsResponseDto {
     private String category;
     private List<String> imgUrls;
     private List<CommentResponseDto> comments;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String createdAt;
+    private String updatedAt;
 
     public PostDetailsResponseDto(Post post, List<CommentResponseDto> commentResponseDtoList) {
         this.title = post.getTitle();

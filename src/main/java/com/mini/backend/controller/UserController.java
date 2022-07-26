@@ -5,14 +5,18 @@ package com.mini.backend.controller;
 
 import com.mini.backend.dto.IdCheckDto;
 import com.mini.backend.dto.SignupRequestDto;
+import com.mini.backend.dto.UpdatePostRequestDto;
+import com.mini.backend.dto.UserUpdateRequestDto;
+import com.mini.backend.security.UserDetailsImpl;
 import com.mini.backend.service.UserService;
+import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 public class UserController {
 
     private final UserService userService;
@@ -36,15 +40,26 @@ public class UserController {
     }
 
     //로그인 처리
-    @PostMapping("api/users/login")
-    public String login() {
-        return "로그인 성공"; // ?
-    }
+//    @PostMapping("api/users/login")
+//    public String login() {
+//        return "로그인 성공"; // ?
+//    }
 
     //로그아웃
-    @PostMapping("api/users/logout")
-    public String logout() {
-        return "redirect:/users/login";
+//    @PostMapping("api/users/logout")
+//    public String logout() {
+//        return "redirect:/users/login";
+//    }
+
+    @GetMapping("/api/users")
+    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return new ResponseEntity<>(userService.getUser(userDetails), HttpStatus.valueOf(200));
+    }
+
+    @PatchMapping("/api/users/{userId}")
+    public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody UserUpdateRequestDto userUpdateRequestDto,
+                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return userService.updateUser(userId, userUpdateRequestDto, userDetails);
     }
 
 }
