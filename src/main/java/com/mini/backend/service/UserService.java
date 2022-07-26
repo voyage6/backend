@@ -1,6 +1,7 @@
 package com.mini.backend.service;
 
 import com.mini.backend.domain.User;
+import com.mini.backend.dto.IdCheckDto;
 import com.mini.backend.dto.SignupRequestDto;
 import com.mini.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,10 @@ public class UserService {
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public void idCheck(IdCheckDto checkDto) {
+
     }
 
     public void registerUser(SignupRequestDto requestDto) {
