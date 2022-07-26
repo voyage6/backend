@@ -29,10 +29,14 @@ public class User {
     @Column(nullable = false)
     private String userName;
 
-    public User(String userId, String userPassword, String userName) {
+    @Column
+    private String profileURL;
+
+    public User(String userId, String userPassword, String userName, String profileURL) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.userName = userName;
+        this.profileURL = profileURL;
     }
 
 }

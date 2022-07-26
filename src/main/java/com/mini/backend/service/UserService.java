@@ -24,8 +24,9 @@ public class UserService {
         String userId = requestDto.getUserId();
         String password = passwordEncoder.encode(requestDto.getUserPassword()); // 패스워드 암호화
         String userName = requestDto.getUserName();
+        String profileURL = requestDto.getProfileURL();
 
-        User user = new User(userId, password, userName);
+        User user = new User(userId, password, userName, profileURL);
         userRepository.save(user);
     }
 
