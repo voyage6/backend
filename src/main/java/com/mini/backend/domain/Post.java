@@ -1,10 +1,12 @@
 package com.mini.backend.domain;
 
+import com.mini.backend.dto.UpdatePostRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import javax.persistence.*;
+import java.awt.*;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -13,18 +15,31 @@ public class Post extends Timestamped{
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private Long id;
+    private Long id;//아이디
 
-    @Column
-    private String title;
+    @Column(nullable = true)
+    private String title;//제목
 
-    @Column
-    private String category;
+    @Column(nullable = true)
+    private String category;//카테고리
 
-    @Column
-    private String contents;
+    @Column(nullable = true)
+    private String contents;//게시물 내용
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne
+    private List<Image> imgeUrls;//이미지??
+
+    @ManyToOne(fetch = FetchType.LAZY)//여러개의 게시글을 가지기에
+    @JoinColumn(name = "userId")
     private User user;
+
+    @OneToMany//여러개의 댓글을 가질 수 있어서????
+    private List<Comment> comment;
+
+    public void update(UpdatePostRequestDto requestDto ){
+        this.title=requestDto.getTitle();
+        this.contents=requestDto.getContents();
+        this.category=requestDto.getCategory();
+        this.imgeUrls=requestDto.getImgeurl();//???
+    }
 }
