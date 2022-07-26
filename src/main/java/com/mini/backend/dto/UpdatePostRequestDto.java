@@ -2,14 +2,14 @@ package com.mini.backend.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
-@Setter
+import java.util.List;
+
 @Getter
 @RequiredArgsConstructor
-public class PostRequestDto {
+public class UpdatePostRequestDto {//수정 요청
     private String title;
     private String contents;
     private String category;
-    private String imageUrl;
+    private List<String> imgUrls;
 }

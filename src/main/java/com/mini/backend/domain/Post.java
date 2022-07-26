@@ -1,6 +1,6 @@
 package com.mini.backend.domain;
 
-import com.mini.backend.dto.PostRequestDto;
+import com.mini.backend.dto.UpdatePostRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -36,10 +36,10 @@ public class Post extends Timestamped{
     @OneToMany//여러개의 댓글을 가질 수 있어서????
     private List<Comment> comment;
 
-    public void update(PostRequestDto requestDto){
+    public void update(UpdatePostRequestDto requestDto ){
         this.title=requestDto.getTitle();
         this.contents=requestDto.getContents();
         this.category=requestDto.getCategory();
-        this.imgeUrls=responseDto.getImgeurl();//???
+        this.imgeUrls=requestDto.getImgeurl();//???
     }
 }
