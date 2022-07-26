@@ -1,11 +1,11 @@
 package com.mini.backend.repository;
 
-import com.mini.backend.domain.User;
+import com.mini.backend.domain.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByUserId(String userId);
+public interface UserRepository extends JpaRepository<Users, Long> {
+    Optional<Users> findByUserId(String userId);
 
 }

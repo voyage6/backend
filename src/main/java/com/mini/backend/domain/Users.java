@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity //DB 테이블 역할
 
-public class User {
+public class Users {
 
     //ID : 인덱스 번호
     @GeneratedValue(strategy = GenerationType.AUTO) // 자동증가
@@ -32,11 +32,10 @@ public class User {
     @Column
     private String profileURL;
 
-    public User(String userId, String userPassword, String userName, String profileURL) {
+    public Users(String userId, String userPassword, String userName) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.userName = userName;
-        this.profileURL = profileURL;
     }
 
 }

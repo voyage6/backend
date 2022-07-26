@@ -2,6 +2,8 @@ package com.mini.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -9,48 +11,57 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
-@EnableWebSecurity // 스프링 Security 지원을 가능하게 함
+@EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    //패스워드 암호화 구현
+    private final UserDetailsServiceImpl userDetailsService;
+
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
     @Bean
     public BCryptPasswordEncoder encodePassword() {
         return new BCryptPasswordEncoder();
     }
 
     @Override
-    public void configure(WebSecurity web) {
-    // h2-console 사용에 대한 허용 (CSRF, FrameOptions 무시)
-        web
-                .ignoring()
-                .antMatchers("/h2-console/**");
-    }
-    @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // 회원 관리 처리 API (POST /user/**) 에 대해 CSRF 무시
-        http.csrf()
-                .ignoringAntMatchers("/user/**");
-
+        http.csrf().disable();
+        http.headers().frameOptions().disable();
         http.authorizeRequests()
-                // image 폴더를 login 없이 허용
-                .antMatchers("/images/**").permitAll()
-                // css 폴더를 login 없이 허용
-                .antMatchers("/css/**").permitAll()
-                // 회원 관리 처리 API 전부를 login 없이 허용
-                .antMatchers("/user/**").permitAll()
 
-                // 어떤 요청이든 '인증'
+                .antMatchers("/images/**").permitAll()
+                .antMatchers("/css/**").permitAll()
+                .antMatchers("/users/**").permitAll()
+                .antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/index/**").permitAll()
+                .antMatchers("/detail.html/**").permitAll()
+                .antMatchers("/api/**").permitAll()
+                .antMatchers("/").permitAll()
+                .antMatchers("/**").permitAll()
+                .antMatchers("*").permitAll()
+
+                // 그 외 모든 요청은 인증과정 필요
                 .anyRequest().authenticated()
                 .and()
-                    // 로그인 기능 허용
-                    .formLogin()
-                    .loginPage("users/login")
-                    .failureUrl("users/login?error")
-                    .defaultSuccessUrl("/")
-                    .permitAll()
-                .and()
-                    // 로그아웃 기능 허용
-                    .logout()
-                    .permitAll();
+                .formLogin()
+                .usernameParameter("userId")
+                .passwordParameter("userPassword")
+                .loginProcessingUrl("/users/login")
+                .successForwardUrl("/")
+                .permitAll();
+
+        http.httpBasic();
+    }
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+
+        return super.authenticationManagerBean();
+    }
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService);
+        auth.eraseCredentials(false);
     }
 }

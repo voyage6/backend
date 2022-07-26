@@ -3,15 +3,14 @@ package com.mini.backend.controller;
 
 //Dto를 가져오는 컨트롤러
 
-import com.mini.backend.domain.User;
 import com.mini.backend.dto.IdCheckDto;
 import com.mini.backend.dto.SignupRequestDto;
 import com.mini.backend.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 public class UserController {
@@ -24,14 +23,14 @@ public class UserController {
 
     //회원 가입 요청
     @PostMapping("/api/users/signup")
-    public ResponseEntity registerUser(SignupRequestDto requestDto) {
+    public ResponseEntity registerUser(@RequestBody SignupRequestDto requestDto) {
         userService.registerUser(requestDto);
         return new ResponseEntity<>("회원가입에 성공하였습니다. ", HttpStatus.valueOf(201));
     }
 
     //아이디 중복확인
     @PostMapping("api/users/idCheck")
-    public ResponseEntity idCheck(IdCheckDto checkDto) {
+    public ResponseEntity idCheck(@RequestBody IdCheckDto checkDto) {
         userService.idCheck(checkDto);
         return new ResponseEntity<>("이미 존재하는 아이디입니다.", HttpStatus.valueOf(200));
     }

@@ -1,6 +1,7 @@
 package com.mini.backend.domain;
 
 import com.mini.backend.dto.CommentRequestDto;
+import com.mini.backend.security.UserDetailsImpl;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,14 +23,14 @@ public class Comment extends Timestamped{
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
-    private User userId;
+    private Users user;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(nullable = false)
     private String contents;
 
     public Comment(Post post, UserDetailsImpl user, CommentRequestDto CommentRequestDto) {
         this.post = post;
-        this.userId = user.getUser();
+        this.user = user.getUser();
         this.contents = CommentRequestDto.getContents();
     }
 

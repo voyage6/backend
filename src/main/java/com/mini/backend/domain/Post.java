@@ -1,11 +1,12 @@
 package com.mini.backend.domain;
 
+import com.mini.backend.dto.PostRequestDto;
 import com.mini.backend.dto.UpdatePostRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -26,20 +27,26 @@ public class Post extends Timestamped{
     @Column(nullable = true)
     private String contents;//게시물 내용
 
-    @ManyToOne
-    private List<Image> imgeUrls;//이미지??
+    @ElementCollection
+    private List<String> imgUrls = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)//여러개의 게시글을 가지기에
     @JoinColumn(name = "userId")
-    private User user;
+    private Users user;
 
-    @OneToMany//여러개의 댓글을 가질 수 있어서????
-    private List<Comment> comment;
+    public Post(PostRequestDto requestDto, Users user) {
+        this.title = requestDto.getTitle();
+        this.contents = requestDto.getContents();
+        this.category = requestDto.getCategory();
+        this.imgUrls =requestDto.getImgUrls();
+//        this.imgFileNames = requestDto.getImgFileNames();
+        this.user = user;
+    }
 
-    public void update(UpdatePostRequestDto requestDto ){
+    public void update(UpdatePostRequestDto requestDto){
         this.title=requestDto.getTitle();
         this.contents=requestDto.getContents();
         this.category=requestDto.getCategory();
-        this.imgeUrls=requestDto.getImgeurl();//???
+        this.imgUrls=requestDto.getImgUrls();//???
     }
 }
