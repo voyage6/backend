@@ -1,16 +1,16 @@
 package com.mini.backend.controller;
 
+import com.mini.backend.domain.Post;
 import com.mini.backend.dto.PostDetailsResponseDto;
 import com.mini.backend.dto.PostRequestDto;
 import com.mini.backend.dto.UpdatePostRequestDto;
 import com.mini.backend.dto.AllPostResponseDto;
-import com.mini.backend.security.UserDetailsImpl;
 import com.mini.backend.service.PostService;
 import com.mini.backend.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,17 +30,21 @@ public class PostController {
         return postService.getAllPosts();
     }
 
+    @GetMapping("/api/postss")//전체조회
+    public Slice<Post> getAllPostss(@RequestParam int page, @RequestParam int size){
+    return postService.getAllPostss(page, size);
+}
+
+
     @PatchMapping("/api/posts/{postId}")//수정
-    public ResponseEntity<?> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequestDto updatePostRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return postService.updatePost(postId, updatePostRequestDto, userDetails);
+    public ResponseEntity<?> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequestDto updatePostRequestDto/*, @AuthenticationPrincipal UserDetailsImpl userDetails*/){
+        return postService.updatePost(postId, updatePostRequestDto/*, userDetails*/);
     }
 
     @PostMapping("/api/posts")
-    public ResponseEntity<?> createPost(@RequestBody PostRequestDto postRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        System.out.println(userDetails.getUser().getUserName());
-        System.out.println(userDetails.getUsername());
-        String userId = userDetails.getUsername();
-        return new ResponseEntity<>(postService.createPost(postRequestDto, userId), HttpStatus.valueOf(201));
+    public ResponseEntity<?> createPost(@RequestBody PostRequestDto postRequestDto/*, @AuthenticationPrincipal UserDetailsImpl userDetails*/) {
+//        String userId = userDetails.getUsername();
+        return new ResponseEntity<>(postService.createPost(postRequestDto/*, userId*/), HttpStatus.valueOf(201));
     }
 
     @GetMapping("/api/posts/{postId}")
@@ -49,9 +53,9 @@ public class PostController {
     }
 
     @DeleteMapping("/api/posts/{postId}")
-    public ResponseEntity<?> deletePost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        String userId = userDetails.getUsername();
-        return postService.deletePost(postId, userId);
+    public ResponseEntity<?> deletePost(@PathVariable Long postId/*, @AuthenticationPrincipal UserDetailsImpl userDetails*/) {
+//        String userId = userDetails.getUsername();
+        return postService.deletePost(postId/*, userId*/);
     }
 
     @PostMapping("api/images")

@@ -1,26 +1,58 @@
 package com.mini.backend.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mini.backend.security.filter.FormLoginFilter;
+import com.mini.backend.security.filter.JwtAuthFilter;
+import com.mini.backend.security.jwt.HeaderTokenExtractor;
+import com.mini.backend.security.provider.FormLoginAuthProvider;
+import com.mini.backend.security.provider.JWTAuthProvider;
+import com.mini.backend.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity // 스프링 Security 지원을 가능하게 함
+@EnableGlobalMethodSecurity(securedEnabled = true) // @Secured 어노테이션 활성화
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserDetailsServiceImpl userDetailsService;
+    private final JWTAuthProvider jwtAuthProvider;
+    private final HeaderTokenExtractor headerTokenExtractor;
 
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService) {
-        this.userDetailsService = userDetailsService;
+    public WebSecurityConfig(
+            JWTAuthProvider jwtAuthProvider,
+            HeaderTokenExtractor headerTokenExtractor
+    ) {
+        this.jwtAuthProvider = jwtAuthProvider;
+        this.headerTokenExtractor = headerTokenExtractor;
     }
 
     @Bean
@@ -29,58 +61,159 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public void configure(AuthenticationManagerBuilder auth) {
+        auth
+                .authenticationProvider(formLoginAuthProvider())
+                .authenticationProvider(jwtAuthProvider);
+    }
+
+    @Override
+    public void configure(WebSecurity web) {
+// h2-console 사용에 대한 허용 (CSRF, FrameOptions 무시)
+        web
+                .ignoring()
+                .antMatchers("/h2-console/**");
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.headers().frameOptions().disable();
-        http.cors().configurationSource(corsConfigurationSource());
-        http.authorizeRequests()
 
-                .antMatchers("/images/**").permitAll()
+        // 서버에서 인증은 JWT로 인증하기 때문에 Session의 생성을 막습니다.
+        http
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        /*
+         * 1.
+         * UsernamePasswordAuthenticationFilter 이전에 FormLoginFilter, JwtFilter 를 등록합니다.
+         * FormLoginFilter : 로그인 인증을 실시합니다.
+         * JwtFilter       : 서버에 접근시 JWT 확인 후 인증을 실시합니다.
+         */
+        http
+                .addFilterBefore(formLoginFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        http
+                .cors()
+                .configurationSource(corsConfigurationSource());
+
+
+        http.authorizeRequests()
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+//// image 폴더를 login 없이 허용
+//                .antMatchers("/images/**").permitAll()
+//// css 폴더를 login 없이 허용
+//                .antMatchers("/css/**").permitAll()
+//// 회원 관리 처리 API 전부를 login 없이 허용
+//                .antMatchers(HttpMethod.GET,"/api/**").permitAll()
+//                .antMatchers(HttpMethod.POST ,"/api/signup").permitAll()
+//                .antMatchers(HttpMethod.POST,"/api/login").permitAll()
+//                .antMatchers(HttpMethod.GET,"/**").permitAll()
+                .antMatchers("/images/**").permitAll()//TODO 아래 다 삭제
                 .antMatchers("/css/**").permitAll()
-                .antMatchers("/users/**").permitAll()
+                .antMatchers("/user/**").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/index/**").permitAll()
                 .antMatchers("/detail.html/**").permitAll()
                 .antMatchers("/api/**").permitAll()
+                .antMatchers("/users/**").permitAll()
+                .antMatchers("/api/posts/**").permitAll()
                 .antMatchers("/").permitAll()
                 .antMatchers("/**").permitAll()
                 .antMatchers("*").permitAll()
-
-                // 그 외 모든 요청은 인증과정 필요
+                .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
+// 그 외 어떤 요청이든 '인증'
                 .anyRequest().authenticated()
                 .and()
-                .formLogin()
-                .usernameParameter("userId")
-                .passwordParameter("userPassword")
-                .loginProcessingUrl("/api/users/login")
-                .successForwardUrl("/")
-                .permitAll()
-                .and()
+// [로그아웃 기능]
                 .logout()
+// 로그아웃 요청 처리 URL
                 .logoutUrl("/api/users/logout")
+                .logoutSuccessUrl("/")
+                .logoutSuccessHandler(new customLogoutSuccessHandler())
                 .permitAll();
+// "접근 불가" 페이지 URL 설정
 
 
+//        http
+//                .exceptionHandling()
+//                .authenticationEntryPoint(new CustomAuthenticationEntryPoint());
         http.httpBasic();
+
+    }
+
+    @Bean
+    public FormLoginFilter formLoginFilter() throws Exception {
+        FormLoginFilter formLoginFilter = new FormLoginFilter(authenticationManager());
+        formLoginFilter.setFilterProcessesUrl("/api/users/login");
+        formLoginFilter.setAuthenticationSuccessHandler(formLoginSuccessHandler());
+        formLoginFilter.afterPropertiesSet();
+        return formLoginFilter;
+    }
+
+    @Bean
+    public FormLoginSuccessHandler formLoginSuccessHandler() {
+        return new FormLoginSuccessHandler();
+    }
+
+    @Bean
+    public FormLoginAuthProvider formLoginAuthProvider() {
+        return new FormLoginAuthProvider(encodePassword());
+    }
+
+    private JwtAuthFilter jwtFilter() throws Exception {
+        List<String> skipPathList = new ArrayList<>();
+
+        // h2-console 허용
+        skipPathList.add("GET,/h2-console/**");
+        skipPathList.add("POST,/h2-console/**");
+        // 회원 관리 API 허용
+        skipPathList.add("POST,/api/users/signup");
+        skipPathList.add("POST,/api/users/login");
+        //전체 게시글 조회
+        skipPathList.add("GET,/api/posts/**");
+        skipPathList.add("GET,/api/post/**");
+        skipPathList.add("GET,/api/users/**");
+        skipPathList.add("POST,/api/posts/**");
+        skipPathList.add("PATCH,/api/posts/**");
+        skipPathList.add("GET,/api/comments/**");
+        skipPathList.add("POST,/api/comments/**");
+        skipPathList.add("DELETE,/api/posts/**");
+        skipPathList.add("DELETE,/api/comments/**");
+        skipPathList.add("POST,/api/images/**");
+        skipPathList.add("GET,/api/images/**");
+        skipPathList.add("DELETE,/api/images/**");
+
+        skipPathList.add("GET,/");
+
+        FilterSkipMatcher matcher = new FilterSkipMatcher(
+                skipPathList,
+                "/**"
+        );
+
+        JwtAuthFilter filter = new JwtAuthFilter(
+                matcher,
+                headerTokenExtractor
+        );
+        filter.setAuthenticationManager(super.authenticationManagerBean());
+
+        return filter;
     }
 
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
-
         return super.authenticationManagerBean();
-    }
-
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService);
-        auth.eraseCredentials(false);
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOrigin("*");
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("http://togetherheyyo.s3-website.ap-northeast-2.amazonaws.com/");
+        configuration.addAllowedOriginPattern("*");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
@@ -88,5 +221,35 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+
+    }
+
+    private static class customLogoutSuccessHandler implements LogoutSuccessHandler {
+        private final ObjectMapper objectMapper = new ObjectMapper();
+
+        @Override
+        public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+            response.setStatus(HttpStatus.OK.value());
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+            objectMapper.writeValue(response.getWriter(),"로그아웃에 성공했습니다");
+
+
+        }
+    }
+
+
+    private static class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+        private final ObjectMapper objectMapper = new ObjectMapper();
+        @Override
+        public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("UTF-8");
+
+
+            objectMapper.writeValue(response.getWriter(), "로그인 후 이용해주세요");
+        }
     }
 }

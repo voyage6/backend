@@ -21,14 +21,14 @@ public class AllPostResponseDto {//응답
     private String category;
     private List<String> imgUrls;//???
     private List<CommentResponseDto> comments;//???
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public AllPostResponseDto(Post post, List<CommentResponseDto> commentResponseDtoList) {
         this.id = post.getId();
         this.title = post.getTitle();
-        this.writerName = post.getUser().getUserName();
-        this.writerId = post.getUser().getId();
+//        this.writerName = post.getUser().getUserName();
+//        this.writerId = post.getUser().getId();
         this.contents = post.getContents();
         this.category = post.getCategory();
         this.imgUrls = post.getImgUrls();

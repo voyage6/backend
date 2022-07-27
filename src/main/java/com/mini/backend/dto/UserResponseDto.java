@@ -12,8 +12,8 @@ public class UserResponseDto {
     private Long userId;
     private String userName;
     private String imgUrl;
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public UserResponseDto(Users user) {
         this.userId = user.getId();

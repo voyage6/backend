@@ -1,6 +1,5 @@
 package com.mini.backend.security;
 
-
 import com.mini.backend.domain.Users;
 import com.mini.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +18,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
-    public UserDetails loadUserByUsername(String userid) throws UsernameNotFoundException {
-        Users user = userRepository.findByUserId(userid)
-                .orElseThrow(() -> new UsernameNotFoundException("Can't find " + userid));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Users user = userRepository.findByUserId(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Can't find " + username));
 
         return new UserDetailsImpl(user);
     }

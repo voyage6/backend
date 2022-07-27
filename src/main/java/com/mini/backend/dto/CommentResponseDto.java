@@ -9,14 +9,18 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class CommentResponseDto {
-    private Long userId;
-    private Long postId;
+    private Long id;
+    private String writerName;
+    private Long writerId;
+    private String profileUrl;
     private String contents;
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     public CommentResponseDto(Comment comment) {
-        this.userId = comment.getUser().getId();
-        this.postId = comment.getPost().getId();
+        this.id = comment.getId();
+//        this.writerName = comment.getUser().getUserName();
+//        this.writerId = comment.getUser().getId();
+//        this.profileUrl = comment.getUser().getProfileURL();
         this.contents = comment.getContents();
         this.createdAt = comment.getCreatedAt();
     }

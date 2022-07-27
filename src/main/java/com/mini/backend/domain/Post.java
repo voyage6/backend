@@ -30,17 +30,17 @@ public class Post extends Timestamped{
     @ElementCollection
     private List<String> imgUrls = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)//여러개의 게시글을 가지기에
-    @JoinColumn(name = "userId")
-    private Users user;
+//    @ManyToOne(fetch = FetchType.LAZY)//여러개의 게시글을 가지기에
+//    @JoinColumn(name = "userId")
+//    private Users user;
 
-    public Post(PostRequestDto requestDto, Users user) {
+    public Post(PostRequestDto requestDto/*, Users user*/) {
         this.title = requestDto.getTitle();
         this.contents = requestDto.getContents();
         this.category = requestDto.getCategory();
         this.imgUrls =requestDto.getImgUrls();
 //        this.imgFileNames = requestDto.getImgFileNames();
-        this.user = user;
+//        this.user = user;
     }
 
     public void update(UpdatePostRequestDto requestDto){
