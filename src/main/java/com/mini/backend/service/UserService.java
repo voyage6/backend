@@ -20,8 +20,14 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
-    public ResponseEntity<?> idCheck(IdCheckDto checkDto) {
-        if(userRepository.findByUserId(checkDto.getUserId()).isPresent())
+//    public ResponseEntity<?> idCheck(IdCheckDto checkDto) {
+//        if(userRepository.findByUserId(checkDto.getUserId()).isPresent())
+//            return new ResponseEntity<>("이미 존재하는 아이디 입니다.", HttpStatus.BAD_REQUEST);
+//        else return new ResponseEntity<>("사용가능한 아이디 입니다.", HttpStatus.OK);
+//    }
+
+    public ResponseEntity<?> idCheck(IdCheckDto idCheckDto) {
+        if (userRepository.findByUserId(idCheckDto.getId()).isPresent())
             return new ResponseEntity<>("이미 존재하는 아이디 입니다.", HttpStatus.BAD_REQUEST);
         else return new ResponseEntity<>("사용가능한 아이디 입니다.", HttpStatus.OK);
     }
@@ -38,35 +44,21 @@ public class UserService {
 
     public UserResponseDto getUser(UserDetailsImpl userDetails) {
         Users user = userRepository.findByUserId(userDetails.getUsername())
-                .orElseThrow( () -> new IllegalArgumentException("ㅇㄴㄹㄴㅇㄹㄴ"));
+                .orElseThrow(() -> new IllegalArgumentException("ㅇㄴㄹㄴㅇㄹㄴ"));
         return new UserResponseDto(userDetails.getUser());
 
     }
 
     public ResponseEntity<?> updateUser(Long userId, UserUpdateRequestDto userUpdateRequestDto, UserDetailsImpl userDetails) {
         Users user = userRepository.findById(userId)
-                .orElseThrow( () -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
-        if(!userId.equals(userDetails.getUser().getId()))
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+        if (!userId.equals(userDetails.getUser().getId()))
             return new ResponseEntity<>(HttpStatus.valueOf(403));
         else {
             user.update(userUpdateRequestDto);
             userRepository.save(user);
             return new ResponseEntity<>(HttpStatus.valueOf(204));
         }
-    }
-
-    public Users login(LoginRequestDto requestDto) {
-        Users user = userRepository.findByUserId(requestDto.getUserId())
-                .orElseThrow( () -> new IllegalArgumentException("유저 없다"));
-        if (user != null) {
-            if (passwordEncoder.matches(requestDto.getUserId(),user.getUserPassword())) { //requestdto가 원래 저장되어있는거, user이 받은거
-                System.out.println("로그인 성공");
-                return user;
-            }
-        } else {
-            throw new NullPointerException("사용자가 존재하지 않습니다");
-        }
-        throw new NullPointerException("사용자가 존재하지 않습니다");
     }
 
 }

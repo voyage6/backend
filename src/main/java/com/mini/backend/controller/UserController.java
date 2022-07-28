@@ -23,16 +23,15 @@ public class UserController {
 
     //회원 가입 요청
     @PostMapping("/api/users/signup")
-    public ResponseEntity registerUser(@RequestBody SignupRequestDto requestDto) {
+    public ResponseEntity<?> registerUser(@RequestBody SignupRequestDto requestDto) {
         userService.registerUser(requestDto);
         return new ResponseEntity<>("회원가입에 성공하였습니다. ", HttpStatus.valueOf(201));
     }
 
     //아이디 중복확인
     @PostMapping("api/users/idCheck")
-    public ResponseEntity idCheck(@RequestBody IdCheckDto checkDto) {
-        userService.idCheck(checkDto);
-        return new ResponseEntity<>("이미 존재하는 아이디입니다.", HttpStatus.valueOf(200));
+    public ResponseEntity<?> idCheck(@RequestBody IdCheckDto checkDto) {
+        return userService.idCheck(checkDto);
     }
 
     @GetMapping("/api/users")
@@ -44,14 +43,6 @@ public class UserController {
     public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody UserUpdateRequestDto userUpdateRequestDto,
                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return userService.updateUser(userId, userUpdateRequestDto, userDetails);
-    }
-
-    @PostMapping("/api/users/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDto requestDto) {
-        System.out.println(requestDto.getUserId());
-        System.out.println(requestDto.getUserPassword());
-        Users user = userService.login(requestDto);
-        return new ResponseEntity(user, HttpStatus.OK);
     }
 
 }

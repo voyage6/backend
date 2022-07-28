@@ -117,7 +117,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/index/**").permitAll()
                 .antMatchers("/detail.html/**").permitAll()
                 .antMatchers("/api/**").permitAll()
-                .antMatchers("/users/**").permitAll()
+                .antMatchers("/api/users/**").permitAll()
                 .antMatchers("/api/posts/**").permitAll()
                 .antMatchers("/").permitAll()
                 .antMatchers("/**").permitAll()
@@ -175,6 +175,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         skipPathList.add("GET,/api/posts/**");
         skipPathList.add("GET,/api/post/**");
         skipPathList.add("GET,/api/users/**");
+        skipPathList.add("POST,/api/users/**");
         skipPathList.add("POST,/api/posts/**");
         skipPathList.add("PATCH,/api/posts/**");
         skipPathList.add("GET,/api/comments/**");

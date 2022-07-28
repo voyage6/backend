@@ -30,12 +30,6 @@ public class PostController {
         return postService.getAllPosts();
     }
 
-    @GetMapping("/api/postss")//전체조회
-    public Slice<Post> getAllPostss(@RequestParam int page, @RequestParam int size){
-    return postService.getAllPostss(page, size);
-}
-
-
     @PatchMapping("/api/posts/{postId}")//수정
     public ResponseEntity<?> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequestDto updatePostRequestDto/*, @AuthenticationPrincipal UserDetailsImpl userDetails*/){
         return postService.updatePost(postId, updatePostRequestDto/*, userDetails*/);

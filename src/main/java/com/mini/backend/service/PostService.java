@@ -46,23 +46,6 @@ public class PostService {
         return posts;
     }
 
-    public Slice<Post> getAllPostss(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-//        List<AllPostResponseDto> posts = new ArrayList<>();
-//        for (Post post : postList) {
-//
-//            List<Comment> commentList = commentRepository.findAllByPostIdOrderByCreatedAtAsc(post.getId());
-//            List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-//            for (Comment comment : commentList) {
-//                CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
-//                commentResponseDtoList.add(commentResponseDto);
-//            }
-//            AllPostResponseDto postAllDto = new AllPostResponseDto(post, commentResponseDtoList);
-//            posts.add(postAllDto);
-//        }
-        return postRepository.findAllByOrderByUpdatedAtAsc(pageable);
-    }
-
     public ResponseEntity<?> updatePost(Long id, UpdatePostRequestDto updatePostRequestDto/*, UserDetailsImpl userDetails*/) {
         Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
 //        if(!post.getUser().getUserId().equals(userDetails.getUsername())){
