@@ -18,9 +18,9 @@ public class CommentResponseDto {
 
     public CommentResponseDto(Comment comment) {
         this.id = comment.getId();
-//        this.writerName = comment.getUser().getUserName();
-//        this.writerId = comment.getUser().getId();
-//        this.profileUrl = comment.getUser().getProfileURL();
+        this.writerName = comment.getUser().getUserName();
+        this.writerId = comment.getUser().getId();
+        this.profileUrl = comment.getUser().getProfileURL();
         this.contents = comment.getContents();
         this.createdAt = comment.getCreatedAt();
     }

@@ -24,8 +24,8 @@ public class PostDetailsResponseDto {
     public PostDetailsResponseDto(Post post, List<CommentResponseDto> commentResponseDtoList) {
         this.id = post.getId();
         this.title = post.getTitle();
-//        this.writerName = post.getUser().getUserName();
-//        this.writerId = post.getUser().getId();
+        this.writerName = post.getUser().getUserName();
+        this.writerId = post.getUser().getId();
         this.contents = post.getContents();
         this.category = post.getCategory();
         this.imgUrls = post.getImgUrls();

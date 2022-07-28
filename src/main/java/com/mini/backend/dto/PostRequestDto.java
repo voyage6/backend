@@ -10,6 +10,6 @@ public class PostRequestDto {
     private String contents;
     private String category;
     private List<String> imgUrls;
-//    private List<String> imgFileNames;
+    private List<String> imgFileNames;
 
 }

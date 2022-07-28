@@ -16,14 +16,14 @@ public class PostResponseDto {
     private String contents;
     private String category;
     private List<String> imgUrls;
-//    private List<String> imgFileNames;
+    private List<String> imgFileNames;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
-//        this.userId = post.getUser().getId();
+        this.userId = post.getUser().getId();
         this.contents = post.getContents();
         this.category = post.getCategory();
         this.imgUrls = post.getImgUrls();

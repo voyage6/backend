@@ -20,14 +20,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
-//    public ResponseEntity<?> idCheck(IdCheckDto checkDto) {
-//        if(userRepository.findByUserId(checkDto.getUserId()).isPresent())
-//            return new ResponseEntity<>("이미 존재하는 아이디 입니다.", HttpStatus.BAD_REQUEST);
-//        else return new ResponseEntity<>("사용가능한 아이디 입니다.", HttpStatus.OK);
-//    }
-
-    public ResponseEntity<?> idCheck(IdCheckDto idCheckDto) {
-        if (userRepository.findByUserId(idCheckDto.getId()).isPresent())
+    public ResponseEntity<?> idCheck(IdCheckDto checkDto) {
+        if(userRepository.findByUserId(checkDto.getId()).isPresent())
             return new ResponseEntity<>("이미 존재하는 아이디 입니다.", HttpStatus.BAD_REQUEST);
         else return new ResponseEntity<>("사용가능한 아이디 입니다.", HttpStatus.OK);
     }
@@ -38,7 +32,9 @@ public class UserService {
         String userName = requestDto.getUserName();
 
         Users user = new Users(userId, userPassword, userName);
-
+        if(userRepository.findByUserId(userId).isPresent()){
+            throw new IllegalArgumentException("이미 존재하는 아이디 입니다.");
+        }
         userRepository.save(user);
     }
 
@@ -46,7 +42,6 @@ public class UserService {
         Users user = userRepository.findByUserId(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("ㅇㄴㄹㄴㅇㄹㄴ"));
         return new UserResponseDto(userDetails.getUser());
-
     }
 
     public ResponseEntity<?> updateUser(Long userId, UserUpdateRequestDto userUpdateRequestDto, UserDetailsImpl userDetails) {

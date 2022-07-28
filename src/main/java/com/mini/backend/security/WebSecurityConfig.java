@@ -148,6 +148,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         FormLoginFilter formLoginFilter = new FormLoginFilter(authenticationManager());
         formLoginFilter.setFilterProcessesUrl("/api/users/login");
         formLoginFilter.setAuthenticationSuccessHandler(formLoginSuccessHandler());
+        formLoginFilter.setAuthenticationFailureHandler(formLoginFailureHandler());
         formLoginFilter.afterPropertiesSet();
         return formLoginFilter;
     }
@@ -156,6 +157,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public FormLoginSuccessHandler formLoginSuccessHandler() {
         return new FormLoginSuccessHandler();
     }
+
+    @Bean
+    public FormLoginFailureHandler formLoginFailureHandler() { return new FormLoginFailureHandler(); }
 
     @Bean
     public FormLoginAuthProvider formLoginAuthProvider() {
@@ -174,17 +178,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //전체 게시글 조회
         skipPathList.add("GET,/api/posts/**");
         skipPathList.add("GET,/api/post/**");
-        skipPathList.add("GET,/api/users/**");
-        skipPathList.add("POST,/api/users/**");
-        skipPathList.add("POST,/api/posts/**");
-        skipPathList.add("PATCH,/api/posts/**");
         skipPathList.add("GET,/api/comments/**");
-        skipPathList.add("POST,/api/comments/**");
-        skipPathList.add("DELETE,/api/posts/**");
-        skipPathList.add("DELETE,/api/comments/**");
-        skipPathList.add("POST,/api/images/**");
         skipPathList.add("GET,/api/images/**");
-        skipPathList.add("DELETE,/api/images/**");
 
         skipPathList.add("GET,/");
 

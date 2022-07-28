@@ -27,8 +27,8 @@ public class AllPostResponseDto {//응답
     public AllPostResponseDto(Post post, List<CommentResponseDto> commentResponseDtoList) {
         this.id = post.getId();
         this.title = post.getTitle();
-//        this.writerName = post.getUser().getUserName();
-//        this.writerId = post.getUser().getId();
+        this.writerName = post.getUser().getUserName();
+        this.writerId = post.getUser().getId();
         this.contents = post.getContents();
         this.category = post.getCategory();
         this.imgUrls = post.getImgUrls();

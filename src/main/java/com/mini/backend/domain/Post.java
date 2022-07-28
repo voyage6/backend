@@ -16,37 +16,36 @@ public class Post extends Timestamped{
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private Long id;//아이디
+    private Long id;
 
     @Column(nullable = true)
-    private String title;//제목
+    private String title;
 
     @Column(nullable = true)
-    private String category;//카테고리
+    private String category;
 
     @Column(nullable = true)
-    private String contents;//게시물 내용
+    private String contents;
 
     @ElementCollection
     private List<String> imgUrls = new ArrayList<>();
 
-//    @ManyToOne(fetch = FetchType.LAZY)//여러개의 게시글을 가지기에
-//    @JoinColumn(name = "userId")
-//    private Users user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    private Users user;
 
-    public Post(PostRequestDto requestDto/*, Users user*/) {
+    public Post(PostRequestDto requestDto, Users user) {
         this.title = requestDto.getTitle();
         this.contents = requestDto.getContents();
         this.category = requestDto.getCategory();
         this.imgUrls =requestDto.getImgUrls();
-//        this.imgFileNames = requestDto.getImgFileNames();
-//        this.user = user;
+        this.user = user;
     }
 
     public void update(UpdatePostRequestDto requestDto){
         this.title=requestDto.getTitle();
         this.contents=requestDto.getContents();
         this.category=requestDto.getCategory();
-        this.imgUrls=requestDto.getImgUrls();//???
+        this.imgUrls=requestDto.getImgUrls();
     }
 }

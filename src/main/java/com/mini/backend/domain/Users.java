@@ -21,12 +21,10 @@ import java.util.Set;
 public class Users extends Timestamped {
 
     //ID : 인덱스 번호
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동증가
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
 
-    //nullable : null 허용 여부
-    //unique : 중복 허용 여부 (false 일 때 중복 허용 한다는 뜻)
     @Column(nullable = false, unique = true)
     private String userId;
 
